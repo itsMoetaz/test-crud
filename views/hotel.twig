@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Increment Room</title>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io('http://localhost:3000');
+
+            document.getElementById('incrementRoomForm').addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const hotelId = document.getElementById('hotelId').value;
+
+                // Émettre un événement WebSocket pour incrémenter le nombre de chambres
+                socket.emit('incrementRoom', { hotelId });
+
+                socket.on('roomIncremented', (response) => {
+                    if (response.success) {
+                        alert(response.message);
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Increment Room Count for a Hotel</h1>
+    <form id="incrementRoomForm">
+        <label for="hotelId">Hotel ID:</label>
+        <input type="text" id="hotelId" name="hotelId" required>
+        <br>
+        <button type="submit">Increment Room Count</button>
+    </form>
+</body>
+</html>

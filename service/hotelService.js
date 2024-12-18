@@ -1,4 +1,5 @@
 var Hotel = require ('../model/hotelModel')
+
 async function list(req,res,next){
     await Hotel.find()
     .then((data,err)=>{
@@ -56,7 +57,25 @@ async function searchHotels(req,res,next){
         }
     })
 }
+function configureSocket(io) {
+    io.on('connection', (socket) => {
+        console.log('A user connected via WebSocket');
+
+        socket.on('incrementRoom', async (data) => {
+            const { hotelId } = data;
+
+                const hotel = await Hotel.findById(hotelId);
+
+                hotel.nbrRooms += 1;
+                await hotel.save();
+
+                socket.emit('roomIncremented', { success: true, message: 'Room count incremented successfully', hotel });
+        });
+    });
+}
+function hotelView(req,res,next){
+    res.render('hotel')
+}
 
 
-
-module.exports = { create, list, supp, modifier,searchHotels }
+module.exports = { create, list, supp, modifier,searchHotels,configureSocket,hotelView }
